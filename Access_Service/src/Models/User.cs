@@ -13,5 +13,7 @@ namespace AuthService.Models
 
         [Required]
         public string Password { get; set; }
+
+        public string UserUuid {get; set;}
     }
 }

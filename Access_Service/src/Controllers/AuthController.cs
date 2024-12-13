@@ -40,6 +40,21 @@ namespace AuthService.Controllers
             return Ok(new { Token = token });
         }
 
+        [HttpPost("revoke")]
+        public IActionResult RevokeToken([FromBody] string token)
+        {
+            var revokedToken = new TokenBlacklist
+            {
+                Token = token,
+                Expiration = DateTime.UtcNow
+            };
+
+            _context.TokenBlacklist.Add(revokedToken);
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
         private string GenerateJwtToken(User user)
         {
             var key = _configuration["Jwt:Key"];
@@ -54,7 +69,8 @@ namespace AuthService.Controllers
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("UserUuid", user.UserUuid)
             };
 
             var token = new JwtSecurityToken(
