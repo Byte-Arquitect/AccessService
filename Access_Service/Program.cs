@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AuthService.Data;
+using MassTransit;
+using ConsumerApi.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +44,32 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<RegisterUserConsumer>();
+    x.AddConsumer<UpdatePasswordConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ReceiveEndpoint("register-user-queue", e =>
+        {
+            e.ConfigureConsumer<RegisterUserConsumer>(context);
+        });
+        
+        cfg.ReceiveEndpoint("update-password-queue", e =>
+        {
+            e.ConfigureConsumer<UpdatePasswordConsumer>(context);
+        });
+
+    });
+});
 
 var app = builder.Build();
 

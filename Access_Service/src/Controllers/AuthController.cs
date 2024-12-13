@@ -43,17 +43,32 @@ namespace AuthService.Controllers
         [HttpPost("revoke")]
         public IActionResult RevokeToken([FromBody] string token)
         {
-            var revokedToken = new TokenBlacklist
-            {
-                Token = token,
-                Expiration = DateTime.UtcNow
-            };
+            var handler = new JwtSecurityTokenHandler();
 
-            _context.TokenBlacklist.Add(revokedToken);
+            if (!handler.CanReadToken(token))
+            {
+                return BadRequest("Invalid token format.");
+            }
+
+            var jwtToken = handler.ReadJwtToken(token);
+            var jti = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
+            var expiration = jwtToken.ValidTo;
+
+            if (string.IsNullOrEmpty(jti))
+            {
+                return BadRequest("Token JTI is missing.");
+            }
+
+            _context.TokenBlacklist.Add(new TokenBlacklist
+            {
+                Jti = jti,
+                Expiration = expiration
+            });
             _context.SaveChanges();
 
-            return Ok();
+            return Ok("Token revoked successfully.");
         }
+
 
         private string GenerateJwtToken(User user)
         {

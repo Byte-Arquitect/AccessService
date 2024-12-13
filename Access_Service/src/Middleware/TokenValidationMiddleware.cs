@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 
-
 public class TokenValidationMiddleware
 {
     private readonly RequestDelegate _next;
@@ -40,11 +39,13 @@ public class TokenValidationMiddleware
             if (jwtToken == null)
                 return false;
 
-            var isRevoked = await context.TokenBlacklist.AnyAsync(rt => rt.Token == token);
-            if (isRevoked)
+            var jti = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
+
+            if (string.IsNullOrEmpty(jti))
                 return false;
 
-            return true;
+            var isRevoked = await context.TokenBlacklist.AnyAsync(tb => tb.Jti == jti);
+            return !isRevoked;
         }
     }
 }
