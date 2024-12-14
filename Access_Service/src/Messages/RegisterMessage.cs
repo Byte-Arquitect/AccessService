@@ -1,8 +1,8 @@
 namespace Shared.Messages; 
 
-public class RegisterMessage
+public class RegisterUserMessage
 {
-    public string Email { get; set; }
-    public string Password { get; set; }
-    public string UserUuid { get; set; }
+    public string Email { get; set; } = null!;
+    public string Password { get; set; } = null!;
+    public string UserUuid { get; set; } = null!;
 }

@@ -5,7 +5,7 @@ using Shared.Messages;
 
 namespace ConsumerApi.Consumers
 {
-    public class RegisterUserConsumer : IConsumer<RegisterMessage>
+    public class RegisterUserConsumer : IConsumer<RegisterUserMessage>
     {
         private readonly DataContext _context;
 
@@ -14,7 +14,7 @@ namespace ConsumerApi.Consumers
             _context = context;
         }
 
-        public async Task Consume(ConsumeContext<RegisterMessage> context)
+        public async Task Consume(ConsumeContext<RegisterUserMessage> context)
         {
             var message = context.Message;
 
