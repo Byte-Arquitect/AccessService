@@ -5,7 +5,7 @@ using Shared.Messages;
 
 namespace ConsumerApi.Consumers
 {
-    public class UpdatePasswordConsumer : IConsumer<UpdateMessage>
+    public class UpdatePasswordConsumer : IConsumer<UpdatePasswordMessage>
     {
         private readonly DataContext _context;
 
@@ -14,7 +14,7 @@ namespace ConsumerApi.Consumers
             _context = context;
         }
 
-        public async Task Consume(ConsumeContext<UpdateMessage> context)
+        public async Task Consume(ConsumeContext<UpdatePasswordMessage> context)
         {
             var message = context.Message;
 

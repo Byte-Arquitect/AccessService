@@ -1,7 +1,7 @@
 namespace Shared.Messages; 
 
-public class UpdateMessage
+public class UpdatePasswordMessage
 {
-    public string UserUuid { get; set; }
-    public string NewPassword { get; set; }
+    public string UserUuid { get; set; } = null!;
+    public string NewPassword { get; set; } = null!;
 }
