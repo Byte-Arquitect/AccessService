@@ -31,7 +31,7 @@ namespace AuthService.Controllers
         {
             var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == loginUserDto.Email);
 
-            if (user == null || user.Password != loginUserDto.Password)
+            if (user == null || !BCrypt.Net.BCrypt.Verify(loginUserDto.Password, user.Password))
             {
                 return Unauthorized();
             }
@@ -92,7 +92,7 @@ namespace AuthService.Controllers
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddMinutes(15),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
